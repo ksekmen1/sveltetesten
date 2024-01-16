@@ -4,8 +4,29 @@
     import ItemThree from '../components/itemThree.svelte';
     import List from '../components/List.svelte';
     import Button from '../components/Button.svelte';
-
+    import { fade } from 'svelte/transition'
+    import { elasticOut } from 'svelte/easing'
     let active = false;
+
+    let visible = true;
+
+    function spin(node, { duration }){
+        return{
+            duration,
+            css: (t) => {
+                const eased = elasticOut(t);
+
+                return `
+                transform: scale(${eased}) rotate(${eased * 1080}deg);
+                color: hsl(
+                    ${~~(t * 360)},
+					${Math.min(100, 1000 - 1000 * t)}%,
+					${Math.min(50, 500 - 500 * t)}%
+                );
+                `;
+            }
+        };
+    }
 
     import { getRandomNumber } from './utils.js';
 
@@ -148,11 +169,35 @@ display_number = result.toString()
 <button on:click={fetchData}>Fetch Data</button>
 <p>Id: {id}</p>
 <p>Name: {name}</p>
+<br/>
+<label>
+	<input type="checkbox" bind:checked={visible} />
+	visible
+</label>
+
+{#if visible}
+	<div class="centered" in:spin={{ duration: 8000 }} out:fade>
+		<span class="spann">Weeeeeeee!!!</span>
+	</div>
+{/if}
 
 
 
 
 <style>
+    .centered {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.spann {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		font-size: 4em;
+	}
+    
 	.active {
 		background-color: blue;
 	}
